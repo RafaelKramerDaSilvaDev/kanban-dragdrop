@@ -1,10 +1,11 @@
+import { CardType } from '../../../types/kanbanTypes'
 import * as S from './styles'
 
-export function Card() {
+export function Card({ title, description }: CardType) {
   return (
     <S.Card>
-      <span>Hello World!</span>
-      <p>ReactJs and TypeScript!</p>
+      <span>{title}</span>
+      <p>{description}</p>
     </S.Card>
   )
 }

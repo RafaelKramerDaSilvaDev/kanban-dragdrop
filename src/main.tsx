@@ -1,13 +1,11 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
+import { App } from './App'
 import { GlobalStyles } from './styles/globalStyles'
-import { Kanban } from './components/Kanban'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <GlobalStyles />
-    <div style={{ padding: '32px' }}>
-      <Kanban />
-    </div>
+    <App />
   </React.StrictMode>,
 )
