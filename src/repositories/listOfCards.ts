@@ -19,5 +19,4 @@ export const listOfCards = [
     title: 'Limpeza',
     description: 'Limpar a casa e arrumar o quarto.',
   },
-  { list: 2, title: 'Lazer', description: 'Assistir a um filme à noite.' },
 ]

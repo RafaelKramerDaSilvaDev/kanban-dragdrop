@@ -1,6 +1,6 @@
 import { PropsWithChildren } from 'react'
-import * as S from './styles'
 import { ListType } from '../../types'
+import * as S from './styles'
 
 type ListProps = PropsWithChildren & ListType
 

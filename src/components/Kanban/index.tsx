@@ -1,7 +1,8 @@
-import { CardType, ListType } from './types'
-import { List } from './components/List'
-import * as S from './styles'
 import { Card } from './components/Card'
+import { List } from './components/List'
+import { useInternalKanban } from './hooks/useInternalKanban'
+import * as S from './styles'
+import { CardType, ListType } from './types'
 
 type KanbanProps = {
   lists: ListType[]
@@ -9,8 +10,10 @@ type KanbanProps = {
 }
 
 export function Kanban({ lists, cards }: KanbanProps) {
+  const { droppableRef } = useInternalKanban({ lists })
+
   return (
-    <S.Kanban>
+    <S.Kanban ref={droppableRef}>
       {lists.map(({ title }, listIndex) => (
         <List key={title} title={title}>
           {cards

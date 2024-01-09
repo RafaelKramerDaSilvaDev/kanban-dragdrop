@@ -9,7 +9,7 @@ export function Card({ title, description }: CardType) {
     handleDroppable,
     isDragging,
     coordinates,
-  } = useInternalKanban()
+  } = useInternalKanban({})
 
   return (
     <S.Card
