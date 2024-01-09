@@ -1,7 +1,7 @@
-import { CardType, ListType } from '../../types/kanbanTypes'
-import { Card } from './Card'
-import { List } from './List'
+import { CardType, ListType } from './types'
+import { List } from './components/List'
 import * as S from './styles'
+import { Card } from './components/Card'
 
 type KanbanProps = {
   lists: ListType[]
@@ -11,11 +11,13 @@ type KanbanProps = {
 export function Kanban({ lists, cards }: KanbanProps) {
   return (
     <S.Kanban>
-      {lists.map(({ title }) => (
-        <List key={title}>
-          {cards.map(({ title, description }) => (
-            <Card key={title} title={title} description={description} />
-          ))}
+      {lists.map(({ title }, listIndex) => (
+        <List key={title} title={title}>
+          {cards
+            .filter(({ list }) => list === listIndex)
+            .map(({ title, description }) => (
+              <Card key={title} title={title} description={description} />
+            ))}
         </List>
       ))}
     </S.Kanban>

@@ -4,4 +4,6 @@ export const Kanban = styled.div`
   display: flex;
   gap: 16px;
   width: 100%;
+
+  user-select: none;
 `

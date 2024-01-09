@@ -1,4 +1,4 @@
-import { CardType, ListType } from '../types/kanbanTypes'
+import { CardType, ListType } from '../components/Kanban/types'
 
 type KanbanProps = {
   lists: ListType[]
