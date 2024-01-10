@@ -3,6 +3,7 @@ export type ListType = {
 }
 
 export type CardType = {
+  id: number
   list?: number
   title: string
   description: string

@@ -5,8 +5,8 @@ import * as S from './styles'
 
 const RESET_COORDINATES = { x: 0, y: 0 }
 
-export function Card({ title, description }: CardType) {
-  const { checkDropZone } = useKanbanContext()
+export function Card({ id, title, description }: CardType) {
+  const { checkDropZone, updateCardList } = useKanbanContext()
 
   const [isDragging, setIsDragging] = useState(false)
   const [coordinates, setCoordinates] = useState(RESET_COORDINATES)
@@ -27,11 +27,18 @@ export function Card({ title, description }: CardType) {
   }
 
   const handleDroppable = () => {
-    const lastCoordinate = coordinates
-
-    checkDropZone(lastCoordinate)
     setIsDragging(false)
     setOffset(RESET_COORDINATES)
+
+    const lastCoordinate = coordinates
+    const dropZone = checkDropZone(lastCoordinate)
+    const isValidDropZone = dropZone !== -1
+
+    if (isValidDropZone) {
+      updateCardList(id, dropZone)
+    } else {
+      setCoordinates(RESET_COORDINATES)
+    }
   }
 
   useEffect(() => {
@@ -41,7 +48,6 @@ export function Card({ title, description }: CardType) {
         const y = e.clientY - offset.y
 
         setCoordinates({ x, y })
-        console.log('Coordenadas atuais: ' + x, y)
       }
     }
 

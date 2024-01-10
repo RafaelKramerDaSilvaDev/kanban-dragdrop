@@ -1,8 +1,6 @@
 import {
-  Dispatch,
   PropsWithChildren,
   RefObject,
-  SetStateAction,
   createContext,
   useCallback,
   useContext,
@@ -10,33 +8,39 @@ import {
   useRef,
   useState,
 } from 'react'
-import { ListType } from '../types'
+import { CardType, ListType } from '../types'
 
 type KanbanContextProps = {
   droppableRef: RefObject<HTMLDivElement>
-
-  setLists: Dispatch<SetStateAction<ListType[]>>
-  checkDropZone: (lastCoordinate: { x: number; y: number }) => void
+  cards: CardType[]
+  setInitialValues: (lists: ListType[], cards: CardType[]) => void
+  checkDropZone: (lastCoordinate: { x: number; y: number }) => number
+  updateCardList: (cardId: number, newListIndex: number) => void
 }
-
-const KanbanContext = createContext({} as KanbanContextProps)
 
 const RESET_DROPPABLE_ZONES = [{ top: 0, left: 0, right: 0, bottom: 0 }]
 
+const kanbanContext = createContext({} as KanbanContextProps)
+
 export function KanbanProvider({ children }: PropsWithChildren) {
   const [droppableZones, setDroppableZones] = useState(RESET_DROPPABLE_ZONES)
-  const [isDropZone, setIsDropZone] = useState(false)
   const [lists, setLists] = useState<ListType[]>([])
+  const [cards, setCards] = useState<CardType[]>([])
 
   const droppableRef = useRef<HTMLDivElement>(null)
+
+  const setInitialValues = (lists: ListType[], cards: CardType[]) => {
+    setLists(lists)
+    setCards(cards)
+  }
 
   const calculateDropZones = useCallback(() => {
     if (!droppableRef.current || !lists) return
 
-    const kanbanRect = droppableRef.current.getBoundingClientRect()
     const scrollTop = window.scrollY
     const scrollLeft = window.scrollX
 
+    const kanbanRect = droppableRef.current.getBoundingClientRect()
     const kanbanTop = kanbanRect.top + scrollTop
     const kanbanBottom = kanbanRect.bottom + scrollTop
     const kanbanLeft = kanbanRect.left + scrollLeft
@@ -51,62 +55,66 @@ export function KanbanProvider({ children }: PropsWithChildren) {
       bottom: kanbanBottom,
       left: kanbanLeft + Math.floor(listIndex * droppableWidth),
     }))
-
     setDroppableZones(droppableZones)
-
-    console.log('Zonas Dropáveis:')
-    console.log(droppableZones)
   }, [lists])
 
   const checkDropZone = (lastCoordinate: { x: number; y: number }) => {
-    console.log(
-      'Última Coordenada: ' + lastCoordinate.x + ' ' + lastCoordinate.y,
-    )
-
-    const isValidDropZone = droppableZones.some((zone) => {
-      return (
+    const listIndex = droppableZones.findIndex(
+      (zone) =>
         lastCoordinate.x >= zone.left &&
         lastCoordinate.x <= zone.right &&
         lastCoordinate.y >= zone.top &&
-        lastCoordinate.y <= zone.bottom
-      )
-    })
-
-    setIsDropZone(isValidDropZone)
-    console.log('É dropável? ' + isValidDropZone)
+        lastCoordinate.y <= zone.bottom,
+    )
+    return listIndex
   }
 
-  useEffect(() => {
-    const droppableContainer = droppableRef.current
-
-    if (droppableContainer) {
-      const resizeObserver = new ResizeObserver((entries) => {
-        for (const entry of entries) {
-          if (entry.target === droppableContainer) {
-            calculateDropZones()
-          }
+  const updateCardList = (cardId: number, newListIndex: number) => {
+    setCards((prevCards) =>
+      prevCards.map((card) => {
+        if (card.id === cardId) {
+          return { ...card, list: newListIndex }
         }
-      })
+        return card
+      }),
+    )
+  }
 
-      resizeObserver.observe(droppableContainer)
+  // useEffect(() => {
+  //   const droppableContainer = droppableRef.current
 
-      return () => resizeObserver.unobserve(droppableContainer)
-    }
-  }, [calculateDropZones])
+  //   if (droppableContainer) {
+  //     const resizeObserver = new ResizeObserver((entries) => {
+  //       for (const entry of entries) {
+  //         if (entry.target === droppableContainer) {
+  //           calculateDropZones()
+  //         }
+  //       }
+  //     })
+
+  //     resizeObserver.observe(droppableContainer)
+
+  //     return () => resizeObserver.unobserve(droppableContainer)
+  //   }
+  // }, [calculateDropZones])
+
+  // useEffect(() => {
+  //   const observer = new MutationObserver((mutations) => {
+  //     mutations.forEach((mutation) => {
+  //       if (mutation.type === 'childList') {
+  //         calculateDropZones()
+  //       }
+  //     })
+  //   })
+
+  //   const config = { childList: true, subtree: true }
+  //   observer.observe(document.body, config)
+
+  //   return () => observer.disconnect()
+  // }, [calculateDropZones])
 
   useEffect(() => {
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.type === 'childList') {
-          calculateDropZones()
-        }
-      })
-    })
-
-    const config = { childList: true, subtree: true }
-    observer.observe(document.body, config)
-
-    return () => observer.disconnect()
+    calculateDropZones()
   }, [calculateDropZones])
 
   useEffect(() => {
@@ -120,21 +128,22 @@ export function KanbanProvider({ children }: PropsWithChildren) {
   }, [calculateDropZones])
 
   return (
-    <KanbanContext.Provider
+    <kanbanContext.Provider
       value={{
         droppableRef,
-
-        setLists,
+        cards,
+        setInitialValues,
         checkDropZone,
+        updateCardList,
       }}
     >
       {children}
-    </KanbanContext.Provider>
+    </kanbanContext.Provider>
   )
 }
 
 export function useKanbanContext() {
-  const context = useContext(KanbanContext)
+  const context = useContext(kanbanContext)
 
   if (context === undefined) {
     throw new Error('useKanbanContext must be used within a KanbanProvider')

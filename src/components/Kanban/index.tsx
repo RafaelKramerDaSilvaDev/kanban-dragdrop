@@ -1,9 +1,9 @@
+import { useEffect } from 'react'
 import { Card } from './components/Card'
 import { List } from './components/List'
 import { KanbanProvider, useKanbanContext } from './context/KanbanContext'
-import { CardType, ListType } from './types'
 import * as S from './styles'
-import { useEffect } from 'react'
+import { CardType, ListType } from './types'
 
 type KanbanProps = {
   lists: ListType[]
@@ -18,12 +18,12 @@ export function Kanban({ lists, cards }: KanbanProps) {
   )
 }
 
-function KanbanChild({ lists, cards }: KanbanProps) {
-  const { droppableRef, setLists } = useKanbanContext()
+function KanbanChild({ lists, cards: initialCards }: KanbanProps) {
+  const { droppableRef, setInitialValues, cards } = useKanbanContext()
 
   useEffect(() => {
-    setLists(lists)
-  }, [lists, setLists])
+    setInitialValues(lists, initialCards)
+  }, [initialCards, lists, setInitialValues])
 
   return (
     <S.Kanban ref={droppableRef}>
@@ -31,8 +31,13 @@ function KanbanChild({ lists, cards }: KanbanProps) {
         <List key={title} title={title}>
           {cards
             .filter(({ list }) => list === listIndex)
-            .map(({ title, description }) => (
-              <Card key={title} title={title} description={description} />
+            .map(({ id, title, description }) => (
+              <Card
+                key={id + title}
+                id={id}
+                title={title}
+                description={description}
+              />
             ))}
         </List>
       ))}
