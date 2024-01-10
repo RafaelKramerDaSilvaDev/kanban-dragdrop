@@ -1,7 +1,7 @@
-import { Kanban } from './components/Kanban'
 import * as S from './AppStyles'
-import { useKanban } from './hooks/useKanban'
 import { listOfCards } from './repositories/listOfCards'
+import { useKanban } from './hooks/useKanban'
+import { Kanban } from './components/Kanban'
 
 export function App() {
   const { kanbanProps } = useKanban({

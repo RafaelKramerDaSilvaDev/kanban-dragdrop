@@ -1,8 +1,9 @@
 import { Card } from './components/Card'
 import { List } from './components/List'
-import { useInternalKanban } from './hooks/useInternalKanban'
-import * as S from './styles'
+import { KanbanProvider, useKanbanContext } from './context/KanbanContext'
 import { CardType, ListType } from './types'
+import * as S from './styles'
+import { useEffect } from 'react'
 
 type KanbanProps = {
   lists: ListType[]
@@ -10,7 +11,19 @@ type KanbanProps = {
 }
 
 export function Kanban({ lists, cards }: KanbanProps) {
-  const { droppableRef } = useInternalKanban({ lists })
+  return (
+    <KanbanProvider>
+      <KanbanChild lists={lists} cards={cards} />
+    </KanbanProvider>
+  )
+}
+
+function KanbanChild({ lists, cards }: KanbanProps) {
+  const { droppableRef, setLists } = useKanbanContext()
+
+  useEffect(() => {
+    setLists(lists)
+  }, [lists, setLists])
 
   return (
     <S.Kanban ref={droppableRef}>
