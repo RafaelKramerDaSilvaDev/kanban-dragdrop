@@ -30,6 +30,12 @@ export const Card = styled.div<CardStyleProps>`
     return 'auto'
   }};
 
+  transform: ${({ $isDragging }) => {
+    if ($isDragging) return 'rotate(-2deg)'
+
+    return 'rotate(0deg)'
+  }};
+
   display: flex;
   flex-direction: column;
   gap: 10px;

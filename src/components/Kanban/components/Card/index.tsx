@@ -14,7 +14,7 @@ export function Card({ title, description }: CardType) {
   return (
     <S.Card
       ref={draggableRef}
-      onMouseDown={(e) => handleDraggable(e)}
+      onMouseDown={handleDraggable}
       onMouseUp={handleDroppable}
       $isDragging={isDragging}
       $coordinates={coordinates}

@@ -66,20 +66,21 @@ export function useInternalKanban({ lists }: InternalKanbanProps) {
 
   const calculateDropZones = useCallback(() => {
     if (!droppableRef.current || !lists) return
+    const kanbanRect = droppableRef.current.getBoundingClientRect()
 
-    const kanbanWidth = droppableRef.current.clientWidth
-    const kanbanHeight = droppableRef.current.clientHeight
+    const kanbanTop = kanbanRect.top
+    const kanbanBottom = kanbanRect.bottom
+    const kanbanLeft = kanbanRect.left
+    const kanbanWidth = kanbanRect.width
+
     const amountOfLists = lists.length
     const droppableWidth = kanbanWidth / amountOfLists
 
     const droppableZones = lists.map((_, listIndex) => ({
-      top: 0,
-      right: Math.floor((listIndex + 1) * droppableWidth),
-      bottom: kanbanHeight,
-      left:
-        listIndex === 0
-          ? Math.floor(listIndex * droppableWidth)
-          : Math.floor(listIndex * droppableWidth) + 1,
+      top: kanbanTop,
+      right: kanbanLeft + Math.floor((listIndex + 1) * droppableWidth),
+      bottom: kanbanBottom,
+      left: kanbanLeft + Math.floor(listIndex * droppableWidth),
     }))
 
     setDroppableZones(droppableZones)
@@ -88,8 +89,6 @@ export function useInternalKanban({ lists }: InternalKanbanProps) {
   const checkDropZone = useCallback(() => {
     const lastDroppableZone = droppableZones?.length - 1
 
-    console.log(lastDroppedPosition)
-    console.log(droppableZones[0])
     if (
       lastDroppedPosition.x < droppableZones[0].left &&
       lastDroppedPosition.x > droppableZones[lastDroppableZone].right &&
@@ -97,19 +96,28 @@ export function useInternalKanban({ lists }: InternalKanbanProps) {
       lastDroppedPosition.y > droppableZones[0].bottom
     ) {
       setIsDropZone(true)
-      console.log('true')
     }
 
     setIsDropZone(false)
-    console.log('false')
   }, [droppableZones, lastDroppedPosition])
 
   useEffect(() => {
-    calculateDropZones()
-  }, [calculateDropZones])
+    const droppableContainer = droppableRef.current
 
-  console.log(lastDroppedPosition)
-  console.log(isDropZone)
+    if (droppableContainer) {
+      const resizeObserver = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.target === droppableContainer) {
+            calculateDropZones()
+          }
+        }
+      })
+
+      resizeObserver.observe(droppableContainer)
+
+      return () => resizeObserver.unobserve(droppableContainer)
+    }
+  }, [calculateDropZones])
 
   return {
     draggableRef,
