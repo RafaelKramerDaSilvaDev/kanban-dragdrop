@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from 'react'
 import { Card } from './components/Card'
 import { List } from './components/List'
@@ -23,7 +24,7 @@ function KanbanChild({ lists, cards: initialCards }: KanbanProps) {
 
   useEffect(() => {
     setInitialValues(lists, initialCards)
-  }, [initialCards, lists, setInitialValues])
+  }, [initialCards, lists])
 
   return (
     <S.Kanban ref={droppableRef}>

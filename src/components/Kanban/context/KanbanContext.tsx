@@ -55,6 +55,7 @@ export function KanbanProvider({ children }: PropsWithChildren) {
       bottom: kanbanBottom,
       left: kanbanLeft + Math.floor(listIndex * droppableWidth),
     }))
+
     setDroppableZones(droppableZones)
   }, [lists])
 
@@ -69,11 +70,11 @@ export function KanbanProvider({ children }: PropsWithChildren) {
     return listIndex
   }
 
-  const updateCardList = (cardId: number, newListIndex: number) => {
+  const updateCardList = (cardId: number, newList: number) => {
     setCards((prevCards) =>
       prevCards.map((card) => {
         if (card.id === cardId) {
-          return { ...card, list: newListIndex }
+          return { ...card, list: newList }
         }
         return card
       }),
